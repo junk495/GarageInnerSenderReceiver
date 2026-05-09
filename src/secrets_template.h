@@ -1,21 +1,12 @@
 #ifndef SECRETS_H
 #define SECRETS_H
+#include <stdint.h>
 
-// =====================================================================================
-//                          GEHEIMER ESP-NOW SCHLÜSSEL
-// =====================================================================================
-// Diese Datei enthält den geheimen Schlüssel für die verschlüsselte
-// Kommunikation zwischen dem Garagen-Sensor (code1c) und dem
-// Garagen-Controller (code2).
-// =====================================================================================
+// Geheimer Schlüssel für ESP-NOW (Primary Master Key). MUSS exakt 16 Zeichen lang sein!
+static const char* pmk_key_str = "1234567890123456"; 
 
-
-// -------------------- ESP-NOW (benötigt von code1c & code2) --------------------
-// Geheimer Schlüssel für die ESP-NOW Verschlüsselung (Primary Master Key).
-// WICHTIG: Muss exakt 16 Zeichen lang sein.
-// KORREKTUR: 'static const' wird verwendet, um die Variable korrekt in
-// einer Header-Datei zu definieren und Linker-Fehler zu vermeiden.
-static const char* pmk_key_str = "YourSecretKey"; // <-- Hier den eigenen geheimen Schlüssel eintragen (16 Zeichen) 
-
+// MAC-Adresse deines Senders (code1c).
+// Nur Nachrichten von dieser Adresse werden vom Empfänger akzeptiert.
+static const uint8_t known_sender_mac[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; 
 
 #endif // SECRETS_H

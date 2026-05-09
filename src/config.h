@@ -12,16 +12,6 @@
 
 #include "secrets.h" // Lädt den geheimen ESP-NOW Schlüssel
 
-// =====================================================================================
-//                          WICHTIGE SICHERHEITSEINSTELLUNG
-// =====================================================================================
-// Trage hier die MAC-Adresse deines Senders (code1c) ein.
-// Nur Nachrichten von dieser Adresse werden akzeptiert.
-// Du findest die MAC-Adresse in der seriellen Ausgabe von code1c beim Start.
-static const uint8_t known_sender_mac[] = {0xDC, 0x06, 0x75, 0xF9, 0x85, 0xE4}; 
-// =====================================================================================
-
-
 // ---------------- Einstellungen ----------------
 #define ESPNOW_CHANNEL 6
 #define FAN_PIN 23
