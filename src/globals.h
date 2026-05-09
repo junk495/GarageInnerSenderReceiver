@@ -29,6 +29,7 @@ extern bool fingerEventReceived;
 extern volatile uint16_t receivedActionID;
 extern uint8_t letzteWakeupCause;
 extern uint32_t lastReceivedMsgCounter; // NEU
+extern volatile bool periodicSendTriggered;
 
 // Watchdog-Variablen
 extern unsigned long lastEspNowMessageTime;

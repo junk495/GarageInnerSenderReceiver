@@ -58,7 +58,7 @@ void sendeLoraDaten(float tIn, float rhIn, float absIn, bool fan) {
   p.confidence = letzteConfidence;
   p.actionID = receivedActionID;
   p.batteryVoltage = letzteBatteryVoltage;
-  p.wakeupCause = letzteWakeupCause; // NEU: Weckgrund der LoRa-Nachricht zuweisen
+  p.wakeupCause = letzteWakeupCause;
 
   ResponseStatus rs = e220ttl.sendFixedMessage(0, 2, 23, &p, sizeof(p));
   
@@ -81,7 +81,7 @@ void sendeLoraDaten(float tIn, float rhIn, float absIn, bool fan) {
   fingerEventReceived = false;
 }
 
-// Wird vom Ticker aufgerufen, um periodisch zu senden
+// Wird nun sicher aus der loop() aufgerufen
 void sendLoraPeriodically() {
   readLocalSensors();
   if (isnan(letzteInnenTemp) || isnan(letzteInnenRH)) {
@@ -97,14 +97,19 @@ void sendLoraPeriodically() {
 void handle_lora_receive() {
   if (e220ttl.available() >= sizeof(CommandPayload)) {
     ResponseStructContainer rsc = e220ttl.receiveMessage(sizeof(CommandPayload));
+    
+    // WICHTIGER FIX: Den restlichen Serial-Buffer leeren (das übrige RSSI-Byte entfernen!)
+    while (Serial2.available()) {
+        Serial2.read();
+    }
+
     if (rsc.status.code == E220_SUCCESS) {
       CommandPayload cmd;
       memcpy(&cmd, rsc.data, sizeof(CommandPayload));
 
       if (cmd.command == 1) { // 1 = TOGGLE_RELAY
-        if (DEBUG1) Serial.println(getTimeStamp() + " [RELAY] Relais-Ansteuerung via LoRa-Befehl empfangen. Prüfe Link & Torstatus...");
+        if (DEBUG1) Serial.println(getTimeStamp() + " [RELAY] Relais-Ansteuerung via LoRa empfangen. Prüfe Link & Torstatus...");
         
-        // Relais nur aktivieren, wenn der Link aktiv ist UND das Tor nicht bereits geschlossen ist.
         if (espNowLinkActive && (letzteTorStatus == 1 || letzteTorStatus == 2)) {
             if (DEBUG1) Serial.println(getTimeStamp() + " [RELAY] Lokaler Status ist 'offen' und Link ist aktiv. Aktiviere Relais.");
             digitalWrite(RELAY_PIN, HIGH);

@@ -41,6 +41,7 @@ uint32_t lastReceivedMsgCounter = 0;
 // Watchdog-Variablen
 unsigned long lastEspNowMessageTime = 0;
 bool espNowLinkActive = false;
+volatile bool periodicSendTriggered = false;
 
 // Lüfter- und Relais-Zustände
 bool fanState = false;
@@ -116,7 +117,7 @@ void setup() {
   lastEspNowMessageTime = millis();
 
   // Periodischen LoRa-Sende-Ticker starten
-  sendTicker.attach(SEND_INTERVAL_S, sendLoraPeriodically);
+  sendTicker.attach(SEND_INTERVAL_S, []() { periodicSendTriggered = true; });
 
   if (DEBUG1) Serial.println(getTimeStamp() + " [SETUP] Initialisierung abgeschlossen.");
 }
@@ -131,6 +132,11 @@ void loop() {
 
   // Auf eingehende LoRa-Befehle prüfen (z.B. Tor schließen)
   handle_lora_receive();
+
+  if (periodicSendTriggered) {
+      periodicSendTriggered = false;
+      sendLoraPeriodically(); 
+  }
 
   // Prüfen, ob das Relais nach seiner Aktivierungszeit wieder ausgeschaltet werden muss
   if (relayActive && (millis() - relayStartTime >= 1000)) {
